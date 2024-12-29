@@ -12,8 +12,6 @@ sum(is.na(data))
 #remove missing values
 data <- na.omit(data)
 
-
-
 sf36 <- data |> 
   select(20:55)
 
@@ -315,7 +313,7 @@ qol_data <- qol_data |>
          Vitality, Social_functioning, Emotional_Role, Pain ) |> 
   mutate(Physical_Health = rowMeans(cbind(Physical_functioning, Physical_role, Bodily_pain, General_health, Vitality), na.rm = TRUE)) |> 
   mutate(Mental_Health = rowMeans(cbind(Social_functioning, Emotional_Role, Pain), na.rm = TRUE )) |> 
-  mutate(QOL_Score = rowMeans(Physical_Health, Mental_Health), na.rm = TRUE ))
+  mutate(QOL_Score = rowMeans(Physical_Health, Mental_Health), na.rm = TRUE )
 
 sf_domains <-  sf_domains |> 
 select(Physical_functioning, Physical_role, Bodily_pain, General_health, 
@@ -335,5 +333,15 @@ sf_domains <- sf_domains |>
     Mental_Health = rowMeans(cbind(Social_functioning, Emotional_Role, Pain), na.rm = TRUE),
     
     # Calculate QOL_Score as the row mean of Physical_Health and Mental_Health
-    QOL_Score = rowMeans(cbind(Physical_Health, Mental_Health), na.rm = TRUE)
+    QOL_Score = rowMeans(cbind(Physical_Health, Mental_Health), na.rm = TRUE),
+    QOL_Status = case_when(
+      QOL_Score <= 50 ~ "Poor",
+      QOL_Score > 50 ~ "Good"
+    )
   )
+
+qol_data <- cbind(demographics, sf_domains)
+
+
+# Export the data
+write.csv(qol_data, "clean_data/QOL_Clean.csv", row.names = FALSE)
